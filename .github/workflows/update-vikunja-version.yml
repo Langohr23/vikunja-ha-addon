@@ -20,12 +20,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      - name: Get latest Vikunja version
+      - name: Get latest Vikunja version from Docker Hub
         id: vikunja
         run: |
-          # Fetch the latest release from Vikunja's GitHub repo
-          LATEST_VERSION=$(curl -s https://api.github.com/repos/go-vikunja/vikunja/releases/latest | jq -r .tag_name)
-          echo "Latest Vikunja version: $LATEST_VERSION"
+          # Fetch available tags from Docker Hub
+          TAGS=$(curl -s "https://hub.docker.com/v2/repositories/vikunja/vikunja/tags?page_size=100" | jq -r '.results[].name')
+          
+          # Filter to get only semantic version tags (e.g., 1.0.0, not "latest" or "unstable")
+          # Find the highest version number
+          LATEST_VERSION=$(echo "$TAGS" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1)
+          
+          echo "Latest Vikunja version on Docker Hub: $LATEST_VERSION"
           echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
       
       - name: Get current version from Dockerfile
