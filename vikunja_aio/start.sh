@@ -12,8 +12,13 @@ PUBLIC_URL=""
 ENABLE_REGISTRATION="true"
 if [ -f /data/options.json ]; then
     PUBLIC_URL=$(jq -r '.PublicURL // empty' /data/options.json)
-    # Correctly handle boolean from JSON: if key exists and is false, result is false.
-    ENABLE_REGISTRATION=$(jq -r 'if .EnableRegistration == false then "false" else "true" end' /data/options.json)
+    RAW_REG_VAL=$(jq -r '.EnableRegistration' /data/options.json)
+    echo "Debug: Raw EnableRegistration from options.json is '$RAW_REG_VAL'"
+    if [ "$RAW_REG_VAL" = "false" ]; then
+        ENABLE_REGISTRATION="false"
+    else
+        ENABLE_REGISTRATION="true"
+    fi
 fi
 
 if [ -z "$PUBLIC_URL" ]; then
