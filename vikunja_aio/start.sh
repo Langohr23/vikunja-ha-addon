@@ -12,7 +12,8 @@ PUBLIC_URL=""
 ENABLE_REGISTRATION="true"
 if [ -f /data/options.json ]; then
     PUBLIC_URL=$(jq -r '.PublicURL // empty' /data/options.json)
-    ENABLE_REGISTRATION=$(jq -r '.EnableRegistration // "true"' /data/options.json)
+    # Convert boolean to lowercase string (true/false)
+    ENABLE_REGISTRATION=$(jq -r '.EnableRegistration // true | tostring | ascii_downcase' /data/options.json)
 fi
 
 if [ -z "$PUBLIC_URL" ]; then
