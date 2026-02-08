@@ -37,11 +37,26 @@ This project provides a [Home Assistant](https://www.home-assistant.io/) Add-on 
     - Check the **Log** tab to ensure the service starts correctly.
     - Once running, click **Open Web UI** to access Vikunja.
 
+## First Time Setup
+
+When you access Vikunja for the first time, you'll need to create your admin account:
+
+1. **No Default Credentials**: Vikunja doesn't come with pre-configured username/password.
+2. **Register Your Admin Account**:
+   - Click on **"Register"** or **"Sign up"** on the Vikunja web interface.
+   - Choose your username, email, and password.
+   - The first user to register automatically becomes an administrator.
+3. **Optional - Disable Public Registration**:
+   - After creating your admin account, you can disable public registration for security.
+   - Go to the Add-on **Configuration** tab and set `EnableRegistration` to `false`.
+   - Restart the add-on for the changes to take effect.
+
 ## Configuration Options
 
 | Option | Description | Default |
 | :--- | :--- | :--- |
 | `PublicURL` | The public URL of your Vikunja instance. | `http://homeassistant.local:3456` |
+| `EnableRegistration` | Allow new users to register accounts. Set to `false` after creating your admin account for security. | `true` |
 
 ## Support
 

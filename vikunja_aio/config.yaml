@@ -16,5 +16,7 @@ map:
   - config:rw
 options:
   PublicURL: "http://homeassistant.local:3456"
+  EnableRegistration: true
 schema:
   PublicURL: str
+  EnableRegistration: bool
