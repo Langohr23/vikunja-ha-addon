@@ -1,5 +1,8 @@
 name: Check for Vikunja Updates
 
+# This workflow requires a Personal Access Token (PAT) to create pull requests.
+# See instructions below on how to set up the PAT_TOKEN secret.
+
 on:
   schedule:
     # Run daily at 6 AM UTC
@@ -73,7 +76,7 @@ jobs:
         id: create_pr
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
           commit-message: "chore: update Vikunja to ${{ steps.vikunja.outputs.latest_version }}"
           title: "Update Vikunja to ${{ steps.vikunja.outputs.latest_version }}"
           body: |
