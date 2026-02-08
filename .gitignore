@@ -1,0 +1,22 @@
+# Mac
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Node
+node_modules/
+npm-debug.log
+
+# Home Assistant Add-on
+.build/
+dist/
+*.qcow2
+*.vmdk
+*.vhdx
+*.vdi
+*.img

@@ -1,0 +1,59 @@
+#!/bin/bash
+set -e
+
+echo "Starting Vikunja Add-on Setup (Pure Bash)..."
+
+# Ensure data directories exist
+mkdir -p /data/vikunja
+mkdir -p /data/files
+
+# Get config options using jq (with fallback)
+FRONTEND_URL=""
+if [ -f /data/options.json ]; then
+    FRONTEND_URL=$(jq -r '.frontend_url // empty' /data/options.json)
+fi
+
+if [ -z "$FRONTEND_URL" ]; then
+    echo "Warning: frontend_url not found or empty, defaulting to localhost"
+    FRONTEND_URL="http://localhost:3456"
+fi
+
+# Get timezone from Supervisor (optional, fallback to UTC)
+TIMEZONE="UTC"
+if [ -n "$SUPERVISOR_TOKEN" ]; then
+    # Try to fetch timezone from Supervisor API
+    # We use a short timeout to prevent hanging if supervisor is unreachable
+    TZ_RESPONSE=$(curl -s -m 5 -H "Authorization: Bearer $SUPERVISOR_TOKEN" http://supervisor/info 2>/dev/null || true)
+    FETCHED_TZ=$(echo "$TZ_RESPONSE" | jq -r '.data.timezone // empty')
+    
+    if [ -n "$FETCHED_TZ" ]; then
+        TIMEZONE="$FETCHED_TZ"
+    fi
+fi
+
+echo "Configuring Vikunja..."
+echo "Frontend URL: $FRONTEND_URL"
+echo "Timezone: $TIMEZONE"
+
+# Configure Vikunja via Environment Variables
+export VIKUNJA_SERVICE_INTERFACE=":3456"
+export VIKUNJA_SERVICE_PUBLICURL="$FRONTEND_URL"
+export VIKUNJA_SERVICE_ROOTPATH="/app/vikunja/frontend"
+export VIKUNJA_SERVICE_STATICPATH="/app/vikunja/frontend"
+export VIKUNJA_SERVICE_ENABLEREGISTRATION="true"
+export VIKUNJA_SERVICE_ENABLEPUBLICLINKSHARE="true"
+export VIKUNJA_SERVICE_ENABLETASKATTACHMENTS="true"
+export VIKUNJA_SERVICE_TIMEZONE="$TIMEZONE"
+
+export VIKUNJA_DATABASE_TYPE="sqlite"
+export VIKUNJA_DATABASE_PATH="/data/vikunja.db"
+
+export VIKUNJA_FILES_BASEPATH="/data/files"
+
+export VIKUNJA_LOG_LEVEL="info"
+
+echo "Starting Vikunja Binary..."
+cd /app/vikunja
+
+# Use exec to replace the shell process
+exec ./vikunja

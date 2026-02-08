@@ -1,0 +1,20 @@
+name: "Vikunja All-in-One"
+version: "0.24.1"
+slug: "vikunja_aio"
+description: "Vikunja (API + Frontend) running on SQLite"
+url: "https://vikunja.io"
+startup: application
+boot: auto
+init: false
+arch:
+  - aarch64
+  - amd64
+  - armv7
+ports:
+  3456/tcp: 3456
+map:
+  - config:rw
+options:
+  frontend_url: "http://homeassistant.local:3456"
+schema:
+  frontend_url: str
