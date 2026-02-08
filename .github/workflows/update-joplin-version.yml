@@ -1,0 +1,146 @@
+name: Check for Joplin Server Updates
+
+# This workflow requires a Personal Access Token (PAT) to create pull requests.
+# It uses the same PAT_TOKEN secret as the Vikunja update workflow.
+
+on:
+  schedule:
+    # Run daily at 7 AM UTC (offset from Vikunja to distribute load)
+    - cron: '0 7 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Get latest Joplin version from Docker Hub
+        id: joplin
+        run: |
+          # Fetch available tags from Docker Hub
+          TAGS=$(curl -s "https://hub.docker.com/v2/repositories/joplin/server/tags?page_size=100" | jq -r '.results[].name')
+          
+          # Filter to get only semantic version tags (e.g., 3.5.2, not "latest" or "unstable")
+          LATEST_VERSION=$(echo "$TAGS" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1)
+          
+          echo "Latest Joplin Server version on Docker Hub: $LATEST_VERSION"
+          echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+      
+      - name: Get current version from Dockerfile
+        id: current
+        run: |
+          CURRENT_VERSION=$(grep "ARG JOPLIN_VERSION=" joplin_server/Dockerfile | cut -d'=' -f2)
+          echo "Current version: $CURRENT_VERSION"
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+      
+      - name: Compare versions
+        id: compare
+        run: |
+          if [ "${{ steps.joplin.outputs.latest_version }}" != "${{ steps.current.outputs.current_version }}" ]; then
+            echo "Update needed!"
+            echo "needs_update=true" >> $GITHUB_OUTPUT
+          else
+            echo "Already up to date!"
+            echo "needs_update=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Update Dockerfile
+        if: steps.compare.outputs.needs_update == 'true'
+        run: |
+          sed -i "s/ARG JOPLIN_VERSION=.*/ARG JOPLIN_VERSION=${{ steps.joplin.outputs.latest_version }}/" joplin_server/Dockerfile
+      
+      - name: Update addon version in config.yaml
+        if: steps.compare.outputs.needs_update == 'true'
+        run: |
+          # Reset addon version to match Joplin version (dropping the -X suffix if it exists)
+          NEW_ADDON_VERSION="${{ steps.joplin.outputs.latest_version }}"
+          echo "Setting addon version to: $NEW_ADDON_VERSION"
+          sed -i "s/^version: \".*\"/version: \"$NEW_ADDON_VERSION\"/" joplin_server/config.yaml
+      
+      - name: Create Pull Request
+        if: steps.compare.outputs.needs_update == 'true'
+        id: create_pr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          commit-message: "chore: update Joplin Server to ${{ steps.joplin.outputs.latest_version }}"
+          title: "Update Joplin Server to ${{ steps.joplin.outputs.latest_version }}"
+          body: |
+            ## 🚀 Joplin Server Update Available
+            
+            A new version of Joplin Server has been released!
+            
+            **Changes:**
+            - Joplin Server version: `${{ steps.current.outputs.current_version }}` → `${{ steps.joplin.outputs.latest_version }}`
+            - Addon version reset to match internal version
+            
+            **Source:**
+            https://hub.docker.com/r/joplin/server/tags
+            
+            ---
+            *This PR was automatically created by the Joplin version check workflow.*
+          branch: update-joplin-${{ steps.joplin.outputs.latest_version }}
+          delete-branch: true
+          labels: |
+            dependencies
+            automated
+      
+      - name: Create GitHub Issue
+        if: steps.compare.outputs.needs_update == 'true'
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT_TOKEN }}
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🔔 New Joplin Server Version Available: ${{ steps.joplin.outputs.latest_version }}',
+              body: `## 🚀 Joplin Server Update Notification
+              
+              A new version of Joplin Server has been detected and a Pull Request has been automatically created.
+              
+              **Version Update:**
+              - Current: \`${{ steps.current.outputs.current_version }}\`
+              - Latest: \`${{ steps.joplin.outputs.latest_version }}\`
+              
+              **Actions Taken:**
+              - ✅ Pull Request created: ${{ steps.create_pr.outputs.pull-request-url }}
+              - ✅ Dockerfile updated
+              - ✅ Addon version synced
+              
+              **Next Steps:**
+              1. Review the Pull Request
+              2. Test the changes if needed
+              3. Merge the PR when ready
+              
+              ---
+              *This issue was automatically created by the Joplin version check workflow.*`,
+              labels: ['notification', 'joplin-update']
+            })
+
+      - name: Generate Summary
+        if: steps.compare.outputs.needs_update == 'true'
+        run: |
+          echo "## 🚀 Joplin Server Update Detected" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "A new version of Joplin Server has been released!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Current Version | \`${{ steps.current.outputs.current_version }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| New Version | \`${{ steps.joplin.outputs.latest_version }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Pull Request | ${{ steps.create_pr.outputs.pull-request-url }} |" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Generate Summary (No Update)
+        if: steps.compare.outputs.needs_update == 'false'
+        run: |
+          echo "## ✅ Joplin Server is Up to Date" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Current version \`${{ steps.current.outputs.current_version }}\` is the latest version." >> $GITHUB_STEP_SUMMARY

@@ -1,4 +1,5 @@
-FROM joplin/server:3.5.2
+ARG JOPLIN_VERSION=3.5.2
+FROM joplin/server:${JOPLIN_VERSION}
 
 USER root
 
