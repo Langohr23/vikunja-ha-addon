@@ -59,21 +59,9 @@ jobs:
       - name: Update addon version in config.yaml
         if: steps.compare.outputs.needs_update == 'true'
         run: |
-          # Get current addon version and increment patch version
-          CURRENT_ADDON_VERSION=$(grep "^version:" vikunja_aio/config.yaml | cut -d'"' -f2)
-          echo "Current addon version: $CURRENT_ADDON_VERSION"
-          
-          # Simple increment (you might want more sophisticated versioning)
-          if [[ $CURRENT_ADDON_VERSION =~ ^([0-9]+)\.([0-9]+)$ ]]; then
-            MAJOR="${BASH_REMATCH[1]}"
-            MINOR="${BASH_REMATCH[2]}"
-            NEW_MINOR=$((MINOR + 1))
-            NEW_ADDON_VERSION="${MAJOR}.${NEW_MINOR}"
-          else
-            NEW_ADDON_VERSION="1.2"
-          fi
-          
-          echo "New addon version: $NEW_ADDON_VERSION"
+          # Set addon version to match Vikunja version
+          NEW_ADDON_VERSION="${{ steps.vikunja.outputs.latest_version }}"
+          echo "Setting addon version to: $NEW_ADDON_VERSION"
           sed -i "s/^version: \".*\"/version: \"$NEW_ADDON_VERSION\"/" vikunja_aio/config.yaml
       
       - name: Create Pull Request
