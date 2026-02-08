@@ -29,7 +29,7 @@ This project provides a [Home Assistant](https://www.home-assistant.io/) Add-on 
 
 3.  **Configuration**:
     - Once installed, go to the **Configuration** tab.
-    - Review the default options. The `frontend_url` should match your Home Assistant URL (e.g., `http://homeassistant.local:8123` or your external URL).
+    - Review the default options. The `PublicURL` should match your Home Assistant URL (e.g., `http://homeassistant.local:8123` or your external URL).
     - Save any changes.
 
 4.  **Start**:
@@ -41,7 +41,7 @@ This project provides a [Home Assistant](https://www.home-assistant.io/) Add-on 
 
 | Option | Description | Default |
 | :--- | :--- | :--- |
-| `frontend_url` | The public URL of your Vikunja instance. | `http://homeassistant.local:3456` |
+| `PublicURL` | The public URL of your Vikunja instance. | `http://homeassistant.local:3456` |
 
 ## Support
 

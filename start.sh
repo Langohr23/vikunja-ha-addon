@@ -8,14 +8,14 @@ mkdir -p /data/vikunja
 mkdir -p /data/files
 
 # Get config options using jq (with fallback)
-FRONTEND_URL=""
+PUBLIC_URL=""
 if [ -f /data/options.json ]; then
-    FRONTEND_URL=$(jq -r '.frontend_url // empty' /data/options.json)
+    PUBLIC_URL=$(jq -r '.PublicURL // empty' /data/options.json)
 fi
 
-if [ -z "$FRONTEND_URL" ]; then
-    echo "Warning: frontend_url not found or empty, defaulting to localhost"
-    FRONTEND_URL="http://localhost:3456"
+if [ -z "$PUBLIC_URL" ]; then
+    echo "Warning: PublicURL not found or empty, defaulting to localhost"
+    PUBLIC_URL="http://localhost:3456"
 fi
 
 # Get timezone from Supervisor (optional, fallback to UTC)
@@ -32,12 +32,12 @@ if [ -n "$SUPERVISOR_TOKEN" ]; then
 fi
 
 echo "Configuring Vikunja..."
-echo "Frontend URL: $FRONTEND_URL"
+echo "Public URL: $PUBLIC_URL"
 echo "Timezone: $TIMEZONE"
 
 # Configure Vikunja via Environment Variables
 export VIKUNJA_SERVICE_INTERFACE=":3456"
-export VIKUNJA_SERVICE_PUBLICURL="$FRONTEND_URL"
+export VIKUNJA_SERVICE_PUBLICURL="$PUBLIC_URL"
 export VIKUNJA_SERVICE_ROOTPATH="/app/vikunja/frontend"
 export VIKUNJA_SERVICE_STATICPATH="/app/vikunja/frontend"
 export VIKUNJA_SERVICE_ENABLEREGISTRATION="true"
