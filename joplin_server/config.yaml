@@ -1,0 +1,35 @@
+name: "Joplin Server All-in-One"
+version: "3.5.2-1"
+slug: "joplin_server"
+description: "A self-hosted Joplin Server with an integrated PostgreSQL database."
+url: "https://joplinapp.org/"
+startup: application
+boot: auto
+init: false
+arch:
+  - aarch64
+  - amd64
+ports:
+  22300/tcp: 22300
+map:
+  - config:rw
+options:
+  APP_BASE_URL: "http://homeassistant.local:22300"
+  AdminEmail: "admin@localhost"
+  MailerEnabled: false
+  MailerHost: ""
+  MailerPort: 587
+  MailerUser: ""
+  MailerPassword: ""
+  MailerFrom: ""
+  MailerSecurity: "starttls"
+schema:
+  APP_BASE_URL: str
+  AdminEmail: str
+  MailerEnabled: bool
+  MailerHost: str
+  MailerPort: int
+  MailerUser: str
+  MailerPassword: password
+  MailerFrom: str
+  MailerSecurity: str
