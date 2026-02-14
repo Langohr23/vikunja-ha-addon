@@ -1,5 +1,5 @@
 name: "Vikunja All-in-One"
-version: "1.0.0"
+version: "1.1.0"
 slug: "vikunja_aio"
 description: "Vikunja (API + Frontend) running on SQLite"
 url: "https://vikunja.io"
