@@ -185,5 +185,10 @@ echo "Launch variables check (Node Process):"
 node -e 'console.log("POSTGRES_HOST in Node:", process.env.POSTGRES_HOST); console.log("DB_HOST in Node:", process.env.DB_HOST)'
 
 # 5. Start the app
+echo "----------------------------------------------------------"
+echo "DEBUG: Letzter Passwort-Reset-Link aus der Datenbank:"
+psql -h 127.0.0.1 -U "$PGUSER_NAME" -d joplin -c "SELECT body FROM emails ORDER BY created_time DESC LIMIT 1;" || echo "Kein Link in der Datenbank gefunden."
+echo "----------------------------------------------------------"
+
 echo "Executing: node dist/app.js"
 exec node dist/app.js

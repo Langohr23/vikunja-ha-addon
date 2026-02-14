@@ -50,13 +50,46 @@ jobs:
             echo "needs_update=false" >> $GITHUB_OUTPUT
           fi
       
-      - name: Update Dockerfile
+      - name: Check for existing PR/Issue
         if: steps.compare.outputs.needs_update == 'true'
+        id: check_duplicate
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT_TOKEN }}
+          script: |
+            const latestVersion = '${{ steps.joplin.outputs.latest_version }}';
+            const { data: pulls } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              head: `${context.repo.owner}:update-joplin-${latestVersion}`
+            });
+            
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'joplin-update'
+            });
+            
+            const existingIssue = issues.find(i => i.title.includes(latestVersion));
+            const duplicate = pulls.length > 0 || !!existingIssue;
+            
+            if (duplicate) {
+              console.log(`Duplicate detected for version ${latestVersion}. Skip further actions.`);
+            } else {
+              console.log(`No existing PR or Issue found for version ${latestVersion}.`);
+            }
+            
+            core.setOutput('duplicate_detected', duplicate.toString());
+
+      - name: Update Dockerfile
+        if: steps.compare.outputs.needs_update == 'true' && steps.check_duplicate.outputs.duplicate_detected != 'true'
         run: |
           sed -i "s/ARG JOPLIN_VERSION=.*/ARG JOPLIN_VERSION=${{ steps.joplin.outputs.latest_version }}/" joplin_server/Dockerfile
       
       - name: Update addon version in config.yaml
-        if: steps.compare.outputs.needs_update == 'true'
+        if: steps.compare.outputs.needs_update == 'true' && steps.check_duplicate.outputs.duplicate_detected != 'true'
         run: |
           # Reset addon version to match Joplin version (dropping the -X suffix if it exists)
           NEW_ADDON_VERSION="${{ steps.joplin.outputs.latest_version }}"
@@ -64,7 +97,7 @@ jobs:
           sed -i "s/^version: \".*\"/version: \"$NEW_ADDON_VERSION\"/" joplin_server/config.yaml
       
       - name: Create Pull Request
-        if: steps.compare.outputs.needs_update == 'true'
+        if: steps.compare.outputs.needs_update == 'true' && steps.check_duplicate.outputs.duplicate_detected != 'true'
         id: create_pr
         uses: peter-evans/create-pull-request@v6
         with:
@@ -92,7 +125,7 @@ jobs:
             automated
       
       - name: Create GitHub Issue
-        if: steps.compare.outputs.needs_update == 'true'
+        if: steps.compare.outputs.needs_update == 'true' && steps.check_duplicate.outputs.duplicate_detected != 'true'
         continue-on-error: true
         uses: actions/github-script@v7
         with:
@@ -126,7 +159,7 @@ jobs:
             })
 
       - name: Generate Summary
-        if: steps.compare.outputs.needs_update == 'true'
+        if: steps.compare.outputs.needs_update == 'true' && steps.check_duplicate.outputs.duplicate_detected != 'true'
         run: |
           echo "## 🚀 Joplin Server Update Detected" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
