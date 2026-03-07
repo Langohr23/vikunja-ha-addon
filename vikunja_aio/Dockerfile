@@ -3,7 +3,9 @@
 # Multi-stage build (most reliable way):
 # --------------------------------------------------------------------------
 ARG BUILD_FROM
+
 ARG VIKUNJA_VERSION=2.1.0
+
 
 # 1. Pull the official Vikunja image
 FROM vikunja/vikunja:${VIKUNJA_VERSION} AS source
