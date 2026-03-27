@@ -1,5 +1,5 @@
 name: "Vikunja All-in-One"
-version: "1.1.0"
+version: "1.2.0"
 slug: "vikunja_aio"
 description: "Vikunja (API + Frontend) running on SQLite"
 url: "https://vikunja.io"
@@ -17,6 +17,18 @@ map:
 options:
   PublicURL: "http://homeassistant.local:3456"
   EnableRegistration: true
+  MailerEnabled: false
+  MailerHost: ""
+  MailerPort: 587
+  MailerUsername: ""
+  MailerPassword: ""
+  MailerFromEmail: ""
 schema:
   PublicURL: str
   EnableRegistration: bool
+  MailerEnabled: bool
+  MailerHost: str?
+  MailerPort: int?
+  MailerUsername: str?
+  MailerPassword: password?
+  MailerFromEmail: str?

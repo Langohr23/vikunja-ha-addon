@@ -10,6 +10,13 @@ mkdir -p /data/files
 # Get config options using jq (with fallback)
 PUBLIC_URL=""
 ENABLE_REGISTRATION="true"
+MAILER_ENABLED="false"
+MAILER_HOST=""
+MAILER_PORT="587"
+MAILER_USERNAME=""
+MAILER_PASSWORD=""
+MAILER_FROMEMAIL=""
+
 if [ -f /data/options.json ]; then
     PUBLIC_URL=$(jq -r '.PublicURL // empty' /data/options.json)
     RAW_REG_VAL=$(jq -r '.EnableRegistration' /data/options.json)
@@ -19,6 +26,16 @@ if [ -f /data/options.json ]; then
     else
         ENABLE_REGISTRATION="true"
     fi
+
+    RAW_MAILER_VAL=$(jq -r '.MailerEnabled // "false"' /data/options.json)
+    if [ "$RAW_MAILER_VAL" = "true" ]; then
+        MAILER_ENABLED="true"
+    fi
+    MAILER_HOST=$(jq -r '.MailerHost // empty' /data/options.json)
+    MAILER_PORT=$(jq -r '.MailerPort // "587"' /data/options.json)
+    MAILER_USERNAME=$(jq -r '.MailerUsername // empty' /data/options.json)
+    MAILER_PASSWORD=$(jq -r '.MailerPassword // empty' /data/options.json)
+    MAILER_FROMEMAIL=$(jq -r '.MailerFromEmail // empty' /data/options.json)
 fi
 
 if [ -z "$PUBLIC_URL" ]; then
@@ -43,6 +60,7 @@ echo "Configuring Vikunja..."
 echo "Public URL: $PUBLIC_URL"
 echo "Timezone: $TIMEZONE"
 echo "Registration Enabled: $ENABLE_REGISTRATION"
+echo "Mailer Enabled: $MAILER_ENABLED"
 
 # Configure Vikunja via Environment Variables
 export VIKUNJA_SERVICE_INTERFACE=":3456"
@@ -53,6 +71,16 @@ export VIKUNJA_SERVICE_ENABLEREGISTRATION="$ENABLE_REGISTRATION"
 export VIKUNJA_SERVICE_ENABLEPUBLICLINKSHARE="true"
 export VIKUNJA_SERVICE_ENABLETASKATTACHMENTS="true"
 export VIKUNJA_SERVICE_TIMEZONE="$TIMEZONE"
+
+export VIKUNJA_MAILER_ENABLED="$MAILER_ENABLED"
+if [ "$MAILER_ENABLED" = "true" ]; then
+    export VIKUNJA_MAILER_HOST="$MAILER_HOST"
+    export VIKUNJA_MAILER_PORT="$MAILER_PORT"
+    export VIKUNJA_MAILER_USERNAME="$MAILER_USERNAME"
+    export VIKUNJA_MAILER_PASSWORD="$MAILER_PASSWORD"
+    export VIKUNJA_MAILER_FROMEMAIL="$MAILER_FROMEMAIL"
+    echo "Mailer configured with host $MAILER_HOST:$MAILER_PORT"
+fi
 
 export VIKUNJA_DATABASE_TYPE="sqlite"
 export VIKUNJA_DATABASE_PATH="/data/vikunja.db"
