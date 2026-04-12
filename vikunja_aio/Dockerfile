@@ -4,7 +4,7 @@
 # --------------------------------------------------------------------------
 ARG BUILD_FROM
 
-ARG VIKUNJA_VERSION=2.2.2
+ARG VIKUNJA_VERSION=2.3.0
 
 
 # 1. Pull the official Vikunja image
