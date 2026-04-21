@@ -1,5 +1,5 @@
 name: "Joplin Server All-in-One"
-version: "3.5.2-2"
+version: "3.6.1"
 slug: "joplin_server"
 description: "A self-hosted Joplin Server with an integrated PostgreSQL database."
 url: "https://joplinapp.org/"
