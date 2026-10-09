@@ -1,6 +1,6 @@
 name: "Vikunja All-in-One"
 
-version: "2.7.0"
+version: "2.7.0.1"
 
 slug: "vikunja_aio"
 description: "Vikunja (API + Frontend) running on SQLite"
