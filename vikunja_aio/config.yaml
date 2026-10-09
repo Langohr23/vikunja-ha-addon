@@ -1,6 +1,6 @@
 name: "Vikunja All-in-One"
 
-version: "2.7.0.1"
+version: "2.7.0.2"
 
 slug: "vikunja_aio"
 description: "Vikunja (API + Frontend) running on SQLite"
@@ -25,6 +25,7 @@ options:
   MailerUsername: ""
   MailerPassword: ""
   MailerFromEmail: ""
+  env_vars: []
 schema:
   PublicURL: str
   EnableRegistration: bool
@@ -34,3 +35,6 @@ schema:
   MailerUsername: str?
   MailerPassword: password?
   MailerFromEmail: str?
+  env_vars:
+    - name: str
+      value: str

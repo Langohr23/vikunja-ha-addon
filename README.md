@@ -70,6 +70,17 @@ When you access Vikunja for the first time, you'll need to create your admin acc
 | :--- | :--- | :--- |
 | `PublicURL` | The public URL of your Vikunja instance. | `http://homeassistant.local:3456` |
 | `EnableRegistration` | Allow new users to register accounts. Set to `false` after creating your admin account for security. | `true` |
+| `env_vars` | List of custom environment variables (`name` and `value`) to pass to Vikunja. | `[]` |
+
+### Custom Environment Variables (Vikunja)
+You can configure any Vikunja setting (like OIDC, LDAP, Redis, custom limits) using the `env_vars` option in the Add-on Configuration tab:
+```yaml
+env_vars:
+  - name: VIKUNJA_SERVICE_TIMEZONE
+    value: "Europe/Berlin"
+  - name: VIKUNJA_AUTH_LOCAL_ENABLED
+    value: "true"
+```
 
 ## Support
 
@@ -93,8 +104,17 @@ If you encounter issues, please check the Add-on logs and report bugs in the [Is
     *   Set `MailerEnabled` to `true`.
     *   Fill in your SMTP details (`MailerHost`, `MailerUser`, etc.).
     *   Set `AdminEmail` to your real email address. The addon will automatically update the admin account's email to this value on start.
-4.  **Login**: Use `admin@localhost` (or your configured `AdminEmail`) and password `admin`.
-5.  **Change Password**: After setting up the Mailer, you can change the password in the "User" section of the Joplin web UI.
+4.  **Custom Environment Variables (`env_vars`)**:
+    *   You can set additional Joplin Server environment variables via the `env_vars` option in the Configuration tab:
+    ```yaml
+    env_vars:
+      - name: STORAGE_DRIVER
+        value: "Database"
+      - name: MAX_SAVE_FILE_SIZE
+        value: "500MB"
+    ```
+5.  **Login**: Use `admin@localhost` (or your configured `AdminEmail`) and password `admin`.
+6.  **Change Password**: After setting up the Mailer, you can change the password in the "User" section of the Joplin web UI.
 
 > [!TIP]
 > If you don't have an SMTP server, you can use a service like SendGrid, Mailgun, or even a Gmail account (with an App Password).

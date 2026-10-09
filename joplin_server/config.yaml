@@ -1,5 +1,5 @@
 name: "Joplin Server All-in-One"
-version: "3.7.2"
+version: "3.7.2.1"
 slug: "joplin_server"
 description: "A self-hosted Joplin Server with an integrated PostgreSQL database."
 url: "https://joplinapp.org/"
@@ -23,6 +23,7 @@ options:
   MailerPassword: ""
   MailerFrom: ""
   MailerSecurity: "starttls"
+  env_vars: []
 schema:
   APP_BASE_URL: str
   AdminEmail: str
@@ -33,3 +34,6 @@ schema:
   MailerPassword: password
   MailerFrom: str
   MailerSecurity: str
+  env_vars:
+    - name: str
+      value: str

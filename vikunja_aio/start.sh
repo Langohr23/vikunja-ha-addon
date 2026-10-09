@@ -91,6 +91,22 @@ export VIKUNJA_FILES_BASEPATH="/data/files"
 
 export VIKUNJA_LOG_LEVEL="info"
 
+# Apply custom environment variables from Home Assistant options
+if [ -f /data/options.json ]; then
+    ENV_COUNT=$(jq -r '.env_vars // [] | length' /data/options.json 2>/dev/null || echo 0)
+    if [ "$ENV_COUNT" -gt 0 ]; then
+        echo "Applying $ENV_COUNT custom environment variable(s) from options..."
+        for ((i=0; i<ENV_COUNT; i++)); do
+            VAR_NAME=$(jq -r ".env_vars[$i].name // empty" /data/options.json)
+            VAR_VALUE=$(jq -r ".env_vars[$i].value // \"\"" /data/options.json)
+            if [ -n "$VAR_NAME" ]; then
+                export "${VAR_NAME}=${VAR_VALUE}"
+                echo "Custom env set: $VAR_NAME"
+            fi
+        done
+    fi
+fi
+
 echo "Starting Vikunja Binary..."
 cd /app/vikunja
 

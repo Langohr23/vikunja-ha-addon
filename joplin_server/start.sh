@@ -181,6 +181,23 @@ EOF
 # 4. Export them for the current shell
 export $(grep -v '^#' .env | xargs)
 
+# 4b. Apply custom environment variables from Home Assistant options
+if [ -f /data/options.json ]; then
+    ENV_COUNT=$(jq -r '.env_vars // [] | length' /data/options.json 2>/dev/null || echo 0)
+    if [ "$ENV_COUNT" -gt 0 ]; then
+        echo "Applying $ENV_COUNT custom environment variable(s) from options..."
+        for ((i=0; i<ENV_COUNT; i++)); do
+            VAR_NAME=$(jq -r ".env_vars[$i].name // empty" /data/options.json)
+            VAR_VALUE=$(jq -r ".env_vars[$i].value // \"\"" /data/options.json)
+            if [ -n "$VAR_NAME" ]; then
+                export "${VAR_NAME}=${VAR_VALUE}"
+                echo "${VAR_NAME}=${VAR_VALUE}" >> .env
+                echo "Custom env set: $VAR_NAME"
+            fi
+        done
+    fi
+fi
+
 echo "Launch variables check (Node Process):"
 node -e 'console.log("POSTGRES_HOST in Node:", process.env.POSTGRES_HOST); console.log("DB_HOST in Node:", process.env.DB_HOST)'
 
