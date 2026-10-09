@@ -7,7 +7,7 @@ echo "Starting Vikunja Add-on Setup (Pure Bash)..."
 mkdir -p /data/vikunja
 mkdir -p /data/files
 
-ln -s /data/vikunja /etc/
+ln -sfn /data/vikunja /etc/vikunja
 
 # Get config options using jq (with fallback)
 PUBLIC_URL=""
