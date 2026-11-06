@@ -115,7 +115,7 @@ jobs:
             - Addon version incremented automatically
             
             **Release Notes:**
-            https://github.com/go-vikunja/vikunja/releases/tag/${{ steps.vikunja.outputs.latest_version }}
+            https://github.com/go-vikunja/vikunja/releases/tag/v${{ steps.vikunja.outputs.latest_version }}
             
             ---
             *This PR was automatically created by the Vikunja version check workflow.*
@@ -151,7 +151,7 @@ jobs:
               
               **Next Steps:**
               1. Review the Pull Request
-              2. Check the [Vikunja Release Notes](https://github.com/go-vikunja/vikunja/releases/tag/${{ steps.vikunja.outputs.latest_version }})
+              2. Check the [Vikunja Release Notes](https://github.com/go-vikunja/vikunja/releases/tag/v${{ steps.vikunja.outputs.latest_version }})
               3. Test the changes if needed
               4. Merge the PR when ready
               
@@ -173,7 +173,7 @@ jobs:
           echo "| Current Version | \`${{ steps.current.outputs.current_version }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| New Version | \`${{ steps.vikunja.outputs.latest_version }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Pull Request | ${{ steps.create_pr.outputs.pull-request-url }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Release Notes | https://github.com/go-vikunja/vikunja/releases/tag/${{ steps.vikunja.outputs.latest_version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Release Notes | https://github.com/go-vikunja/vikunja/releases/tag/v${{ steps.vikunja.outputs.latest_version }} |" >> $GITHUB_STEP_SUMMARY
       
       - name: Generate Summary (No Update)
         if: steps.compare.outputs.needs_update == 'false'
