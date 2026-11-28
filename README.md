@@ -17,6 +17,12 @@ A self-hosted synchronization server for [Joplin](https://joplinapp.org/), the o
 ### 3. Antigravity Remote
 Runs Google Antigravity CLI (`agy`) with Remote Control in Home Assistant so you can access local-network MCP servers via Gemini Remote (`antigravity.google`).
 
+### 4. Outlook.com MCP Server
+Exposes [`mpalermiti/outlook-mcp`](https://github.com/mpalermiti/outlook-mcp) over Streamable HTTP (port `8080`) for personal Outlook.com accounts (mail, calendar, contacts, tasks).
+
+### 5. IMAP/SMTP Email MCP Server
+Exposes [`codefuturist/email-mcp`](https://github.com/codefuturist/email-mcp) over Streamable HTTP (port `8081`) for multi-account IMAP/SMTP reading, searching, and sending.
+
 ---
 
 ## Vikunja Installation
@@ -155,3 +161,25 @@ mcp_servers:
     server_url: "http://192.168.1.50:8080/mcp"
     auth_header: "Bearer your-token"
 ```
+
+---
+
+## Outlook.com MCP Server Installation
+
+Runs [`mpalermiti/outlook-mcp`](https://github.com/mpalermiti/outlook-mcp) wrapped with `supergateway` on port `8080` (`/mcp`), plus a Home Assistant Ingress Web Terminal for diagnostics/device-code login.
+
+1. Create an Azure App Registration (personal Microsoft accounts, public client flow enabled, Graph permissions `Mail.ReadWrite`, `Mail.Send`, `Calendars.ReadWrite`, `Contacts.ReadWrite`, `Tasks.ReadWrite`, `User.Read`).
+2. Set `outlook_client_id` in the add-on **Configuration** tab and start the add-on.
+3. Check the add-on **Log** (or **Open Web UI**) to complete the Microsoft device-code sign-in.
+4. Connect `antigravity_remote` to `http://<homeassistant-ip>:8080/mcp`.
+
+---
+
+## IMAP/SMTP Email MCP Server Installation
+
+Runs [`codefuturist/email-mcp`](https://github.com/codefuturist/email-mcp) wrapped with `supergateway` on port `8081` (`/mcp`), plus a Home Assistant Ingress Web Terminal for interactive account setup.
+
+1. Start the add-on and click **Open Web UI**.
+2. Run `email-mcp setup` (or `email-mcp account add` and `email-mcp test`) to configure your IMAP/SMTP mailboxes.
+3. Once `/data/email-mcp/config.toml` exists, the MCP server starts automatically within 10 seconds.
+4. Connect `antigravity_remote` to `http://<homeassistant-ip>:8081/mcp`.
