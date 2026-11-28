@@ -11,6 +11,9 @@ A self-hosted to-do app. Runs Vikunja (API + Frontend) with an SQLite database i
 ### 2. Joplin Server All-in-One
 A self-hosted synchronization server for [Joplin](https://joplinapp.org/), the open-source note-taking app. Includes an integrated PostgreSQL database.
 
+### 3. Antigravity Remote
+Runs Google Antigravity CLI (`agy`) with Remote Control in Home Assistant so you can access local-network MCP servers via Gemini Remote (`antigravity.google`).
+
 ---
 
 ## Vikunja Installation
@@ -118,3 +121,34 @@ If you encounter issues, please check the Add-on logs and report bugs in the [Is
 
 > [!TIP]
 > If you don't have an SMTP server, you can use a service like SendGrid, Mailgun, or even a Gmail account (with an App Password).
+
+---
+
+## Antigravity Remote Installation
+
+Runs the Google Antigravity CLI (`agy`) with **Remote Control** enabled, allowing you to use local-network MCP servers (Streamable HTTP/SSE or `stdio`) from Gemini Remote (`https://antigravity.google`).
+
+### First-Time Google Sign-In (Web UI)
+1. Start the **Antigravity Remote** add-on.
+2. Click **Open Web UI** (Home Assistant Ingress) to open the built-in web terminal.
+3. Run `agy login` and open the printed Google OAuth URL in your browser to sign in.
+4. Once signed in, the add-on automatically starts `agy remote-control` within 15 seconds.
+
+### Configuration Options
+
+| Option | Description | Default |
+| :--- | :--- | :--- |
+| `instance_name` | Name shown in Antigravity Remote Control. | `"Home Assistant"` |
+| `api_key` | Optional `ANTIGRAVITY_API_KEY` for headless authentication. | `""` |
+| `workspace_dir` | Working directory inside the container. | `"/config"` |
+| `mcp_servers` | List of local/remote MCP servers (`name`, `server_url`, `auth_header`, `command`, `args`). | `[]` |
+| `mcp_config_json` | Optional raw JSON for `~/.gemini/config/mcp_config.json` (must contain `"mcpServers"`). | `""` |
+| `env_vars` | List of custom environment variables (`name` and `value`). | `[]` |
+
+### Example `mcp_servers` Configuration
+```yaml
+mcp_servers:
+  - name: "homeassistant-mcp"
+    server_url: "http://192.168.1.50:8080/mcp"
+    auth_header: "Bearer your-token"
+```
