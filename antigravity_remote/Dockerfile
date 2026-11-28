@@ -12,8 +12,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nodejs \
     npm \
     tini \
-    ttyd \
     && rm -rf /var/lib/apt/lists/*
+
+# Install ttyd (static binary for x86_64 / aarch64; not in Debian bookworm apt)
+RUN curl -fsSL "https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.$(uname -m)" -o /usr/local/bin/ttyd \
+    && chmod +x /usr/local/bin/ttyd
 
 # Install Google Antigravity CLI (agy)
 RUN curl -fsSL https://antigravity.google/cli/install.sh | bash \
