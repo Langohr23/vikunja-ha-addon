@@ -1,5 +1,5 @@
 name: "IMAP/SMTP Email MCP Server"
-version: "1.0.0"
+version: "1.0.1"
 slug: "email_mcp"
 description: "Multi-account IMAP/SMTP MCP server (read, search, send, reply) exposed over Streamable HTTP."
 url: "https://github.com/codefuturist/email-mcp"
@@ -16,9 +16,11 @@ ports:
   8081/tcp: 8081
 options:
   config_toml: ""
+  enable_web_terminal: true
   env_vars: []
 schema:
   config_toml: str?
+  enable_web_terminal: bool
   env_vars:
     - name: str
       value: str

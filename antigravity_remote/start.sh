@@ -22,12 +22,14 @@ INSTANCE_NAME="Home Assistant"
 API_KEY=""
 WORKSPACE_DIR="/data/workspace"
 MCP_CONFIG_RAW=""
+ENABLE_WEB_TERMINAL="true"
 
 if [ -f "$OPTIONS_FILE" ]; then
     INSTANCE_NAME=$(jq -r '.instance_name // "Home Assistant"' "$OPTIONS_FILE")
     API_KEY=$(jq -r '.api_key // empty' "$OPTIONS_FILE")
     WORKSPACE_DIR=$(jq -r '.workspace_dir // "/data/workspace"' "$OPTIONS_FILE")
     MCP_CONFIG_RAW=$(jq -r '.mcp_config_json // empty' "$OPTIONS_FILE")
+    ENABLE_WEB_TERMINAL=$(jq -r 'if .enable_web_terminal == false then "false" else "true" end' "$OPTIONS_FILE")
 
     # Apply custom environment variables
     ENV_COUNT=$(jq -r '.env_vars // [] | length' "$OPTIONS_FILE" 2>/dev/null || echo 0)
@@ -106,15 +108,21 @@ mkdir -p "$WORKSPACE_DIR"
 cd "$WORKSPACE_DIR"
 echo "Workspace directory: $(pwd)"
 
-# Start Ingress Web Terminal (ttyd) for interactive OAuth login and diagnostics
-echo "Starting Ingress Web Terminal on port 8099..."
-ttyd -W -p 8099 /app/web-terminal.sh &
-TTYD_PID=$!
+TTYD_PID=""
+if [ "$ENABLE_WEB_TERMINAL" = "true" ]; then
+    echo "Starting Ingress Web Terminal on port 8099..."
+    ttyd -W -p 8099 /app/web-terminal.sh &
+    TTYD_PID=$!
+else
+    echo "Ingress Web Terminal disabled (enable_web_terminal: false)."
+fi
 
 cleanup() {
     echo "Stopping Antigravity Remote Control and Web Terminal..."
     agy remote-control stop >/dev/null 2>&1 || true
-    kill "$TTYD_PID" >/dev/null 2>&1 || true
+    if [ -n "$TTYD_PID" ]; then
+        kill "$TTYD_PID" >/dev/null 2>&1 || true
+    fi
     exit 0
 }
 trap cleanup SIGTERM SIGINT

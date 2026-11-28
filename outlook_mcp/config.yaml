@@ -1,5 +1,5 @@
 name: "Outlook.com MCP Server"
-version: "1.0.0"
+version: "1.0.1"
 slug: "outlook_mcp"
 description: "MCP server for personal Outlook.com accounts (mail, calendar, contacts, tasks) exposed over Streamable HTTP."
 url: "https://github.com/mpalermiti/outlook-mcp"
@@ -16,9 +16,11 @@ ports:
   8080/tcp: 8080
 options:
   outlook_client_id: ""
+  enable_web_terminal: true
   env_vars: []
 schema:
   outlook_client_id: str
+  enable_web_terminal: bool
   env_vars:
     - name: str
       value: str

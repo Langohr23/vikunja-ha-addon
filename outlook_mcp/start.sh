@@ -26,8 +26,10 @@ do
 done
 
 OUTLOOK_CLIENT_ID=""
+ENABLE_WEB_TERMINAL="true"
 if [ -f "$OPTIONS_FILE" ]; then
     OUTLOOK_CLIENT_ID=$(jq -r '.outlook_client_id // empty' "$OPTIONS_FILE")
+    ENABLE_WEB_TERMINAL=$(jq -r 'if .enable_web_terminal == false then "false" else "true" end' "$OPTIONS_FILE")
 
     ENV_COUNT=$(jq -r '.env_vars // [] | length' "$OPTIONS_FILE" 2>/dev/null || echo 0)
     if [ "$ENV_COUNT" -gt 0 ]; then
@@ -50,17 +52,23 @@ elif [ -z "${OUTLOOK_CLIENT_ID:-}" ]; then
     echo "Warning: outlook_client_id is not set in add-on options!"
 fi
 
-# Start Ingress Web Terminal on port 8099
-echo "Starting Ingress Web Terminal on port 8099..."
-ttyd -W -p 8099 /app/web-terminal.sh &
-TTYD_PID=$!
+TTYD_PID=""
+if [ "$ENABLE_WEB_TERMINAL" = "true" ]; then
+    echo "Starting Ingress Web Terminal on port 8099..."
+    ttyd -W -p 8099 /app/web-terminal.sh &
+    TTYD_PID=$!
+else
+    echo "Ingress Web Terminal disabled (enable_web_terminal: false)."
+fi
 
 cleanup() {
     echo "Stopping Outlook.com MCP Server..."
-    kill "$TTYD_PID" >/dev/null 2>&1 || true
+    if [ -n "$TTYD_PID" ]; then
+        kill "$TTYD_PID" >/dev/null 2>&1 || true
+    fi
     exit 0
 }
 trap cleanup SIGTERM SIGINT
 
-echo "Starting supergateway (Streamable HTTP) on port 8080 -> /mcp..."
-exec supergateway --port 8080 --outputTransport streamableHttp --stdio "outlook-mcp"
+echo "Starting mcp-proxy (Streamable HTTP/SSE) on port 8080..."
+exec mcp-proxy --port=8080 --host=0.0.0.0 --pass-environment -- outlook-mcp

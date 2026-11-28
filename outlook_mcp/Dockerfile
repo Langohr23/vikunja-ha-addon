@@ -1,15 +1,13 @@
-FROM node:22-bookworm-slim
+FROM python:3.12-slim
 
 USER root
 
-# Install Python, jq, curl, tini, and dependencies
+# Install minimal runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
     ca-certificates \
     curl \
     jq \
-    python3 \
-    python3-pip \
     tini \
     && rm -rf /var/lib/apt/lists/*
 
@@ -17,9 +15,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN curl -fsSL "https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.$(uname -m)" -o /usr/local/bin/ttyd \
     && chmod +x /usr/local/bin/ttyd
 
-# Install supergateway (MCP stdio -> Streamable HTTP bridge) and outlook-mcp
-RUN npm install -g supergateway \
-    && pip3 install --no-cache-dir --break-system-packages outlook-mcp
+# Install mcp-proxy (Python Streamable HTTP/SSE bridge) and outlook-mcp (no Node.js needed)
+RUN pip3 install --no-cache-dir mcp-proxy outlook-mcp
 
 COPY start.sh /app/start.sh
 COPY web-terminal.sh /app/web-terminal.sh

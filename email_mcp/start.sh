@@ -24,8 +24,10 @@ fi
 ln -sfn "$PERSIST_SHARE" /root/.local/share
 
 CONFIG_TOML_RAW=""
+ENABLE_WEB_TERMINAL="true"
 if [ -f "$OPTIONS_FILE" ]; then
     CONFIG_TOML_RAW=$(jq -r '.config_toml // empty' "$OPTIONS_FILE")
+    ENABLE_WEB_TERMINAL=$(jq -r 'if .enable_web_terminal == false then "false" else "true" end' "$OPTIONS_FILE")
 
     ENV_COUNT=$(jq -r '.env_vars // [] | length' "$OPTIONS_FILE" 2>/dev/null || echo 0)
     if [ "$ENV_COUNT" -gt 0 ]; then
@@ -47,14 +49,20 @@ if [ -n "$CONFIG_TOML_RAW" ]; then
     echo "Wrote config.toml from add-on options."
 fi
 
-# Start Ingress Web Terminal on port 8099
-echo "Starting Ingress Web Terminal on port 8099..."
-ttyd -W -p 8099 /app/web-terminal.sh &
-TTYD_PID=$!
+TTYD_PID=""
+if [ "$ENABLE_WEB_TERMINAL" = "true" ]; then
+    echo "Starting Ingress Web Terminal on port 8099..."
+    ttyd -W -p 8099 /app/web-terminal.sh &
+    TTYD_PID=$!
+else
+    echo "Ingress Web Terminal disabled (enable_web_terminal: false)."
+fi
 
 cleanup() {
     echo "Stopping IMAP/SMTP Email MCP Server..."
-    kill "$TTYD_PID" >/dev/null 2>&1 || true
+    if [ -n "$TTYD_PID" ]; then
+        kill "$TTYD_PID" >/dev/null 2>&1 || true
+    fi
     exit 0
 }
 trap cleanup SIGTERM SIGINT

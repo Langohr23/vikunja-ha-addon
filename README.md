@@ -150,6 +150,7 @@ Runs the Google Antigravity CLI (`agy`) with **Remote Control** enabled, allowin
 | `instance_name` | Name shown in Antigravity Remote Control. | `"Home Assistant"` |
 | `api_key` | Optional `ANTIGRAVITY_API_KEY` for headless authentication. | `""` |
 | `workspace_dir` | Working directory inside the container. | `"/data/workspace"` |
+| `enable_web_terminal` | Enable Ingress Web Terminal (`ttyd`). Set to `false` after setup to save RAM. | `true` |
 | `mcp_servers` | List of local/remote MCP servers (`name`, `server_url`, `auth_header`, `command`, `args`). | `[]` |
 | `mcp_config_json` | Optional raw JSON for `~/.gemini/config/mcp_config.json` (must contain `"mcpServers"`). | `""` |
 | `env_vars` | List of custom environment variables (`name` and `value`). | `[]` |
@@ -166,7 +167,7 @@ mcp_servers:
 
 ## Outlook.com MCP Server Installation
 
-Runs [`mpalermiti/outlook-mcp`](https://github.com/mpalermiti/outlook-mcp) wrapped with `supergateway` on port `8080` (`/mcp`), plus a Home Assistant Ingress Web Terminal for diagnostics/device-code login.
+Runs [`mpalermiti/outlook-mcp`](https://github.com/mpalermiti/outlook-mcp) wrapped with [`mcp-proxy`](https://github.com/sparfenyuk/mcp-proxy) on port `8080` (`/mcp`), plus an optional Home Assistant Ingress Web Terminal (`enable_web_terminal`, can be set to `false` after setup to save RAM).
 
 1. Create an Azure App Registration (personal Microsoft accounts, public client flow enabled, Graph permissions `Mail.ReadWrite`, `Mail.Send`, `Calendars.ReadWrite`, `Contacts.ReadWrite`, `Tasks.ReadWrite`, `User.Read`).
 2. Set `outlook_client_id` in the add-on **Configuration** tab and start the add-on.
