@@ -2,15 +2,12 @@ FROM debian:bookworm-slim
 
 USER root
 
-# Install dependencies (curl, jq, tini, git, Node.js/npm for optional stdio MCP servers)
+# Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
     ca-certificates \
     curl \
-    git \
     jq \
-    nodejs \
-    npm \
     tini \
     && rm -rf /var/lib/apt/lists/*
 
