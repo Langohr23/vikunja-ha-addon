@@ -1,5 +1,5 @@
 name: "Antigravity Remote"
-version: "1.0.1"
+version: "1.0.2"
 slug: "antigravity_remote"
 description: "Run Google Antigravity CLI (agy) with Remote Control to expose local-network MCP servers via Gemini Remote."
 url: "https://antigravity.google"
