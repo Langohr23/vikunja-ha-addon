@@ -17,7 +17,7 @@ map:
 options:
   instance_name: "Home Assistant"
   api_key: ""
-  workspace_dir: "/config"
+  workspace_dir: "/data/workspace"
   mcp_servers: []
   mcp_config_json: ""
   env_vars: []

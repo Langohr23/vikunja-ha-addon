@@ -20,13 +20,13 @@ ln -sfn "$PERSIST_DIR" /root/.gemini
 # Defaults
 INSTANCE_NAME="Home Assistant"
 API_KEY=""
-WORKSPACE_DIR="/config"
+WORKSPACE_DIR="/data/workspace"
 MCP_CONFIG_RAW=""
 
 if [ -f "$OPTIONS_FILE" ]; then
     INSTANCE_NAME=$(jq -r '.instance_name // "Home Assistant"' "$OPTIONS_FILE")
     API_KEY=$(jq -r '.api_key // empty' "$OPTIONS_FILE")
-    WORKSPACE_DIR=$(jq -r '.workspace_dir // "/config"' "$OPTIONS_FILE")
+    WORKSPACE_DIR=$(jq -r '.workspace_dir // "/data/workspace"' "$OPTIONS_FILE")
     MCP_CONFIG_RAW=$(jq -r '.mcp_config_json // empty' "$OPTIONS_FILE")
 
     # Apply custom environment variables

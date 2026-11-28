@@ -143,7 +143,7 @@ Runs the Google Antigravity CLI (`agy`) with **Remote Control** enabled, allowin
 | :--- | :--- | :--- |
 | `instance_name` | Name shown in Antigravity Remote Control. | `"Home Assistant"` |
 | `api_key` | Optional `ANTIGRAVITY_API_KEY` for headless authentication. | `""` |
-| `workspace_dir` | Working directory inside the container. | `"/config"` |
+| `workspace_dir` | Working directory inside the container. | `"/data/workspace"` |
 | `mcp_servers` | List of local/remote MCP servers (`name`, `server_url`, `auth_header`, `command`, `args`). | `[]` |
 | `mcp_config_json` | Optional raw JSON for `~/.gemini/config/mcp_config.json` (must contain `"mcpServers"`). | `""` |
 | `env_vars` | List of custom environment variables (`name` and `value`). | `[]` |
