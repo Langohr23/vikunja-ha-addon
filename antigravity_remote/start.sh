@@ -122,7 +122,8 @@ trap cleanup SIGTERM SIGINT
 # Start and monitor Remote Control without crash-looping if login is still pending
 NOTIFIED_LOGIN=0
 while true; do
-    if agy remote-control status >/dev/null 2>&1; then
+    STATUS_OUT=$(agy remote-control status 2>&1 || true)
+    if echo "$STATUS_OUT" | grep -qiE "Daemon status:\s*(active|running)"; then
         NOTIFIED_LOGIN=0
         sleep 30 &
         wait $!
@@ -136,7 +137,7 @@ while true; do
         else
             if [ "$NOTIFIED_LOGIN" -eq 0 ]; then
                 echo "Remote Control could not start yet (most likely waiting for Google login)."
-                echo "Open the Add-on Web UI in Home Assistant and run: agy login"
+                echo "Open the Add-on Web UI in Home Assistant and run: agy"
                 NOTIFIED_LOGIN=1
             fi
             sleep 15 &

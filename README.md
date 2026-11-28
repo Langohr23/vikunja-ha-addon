@@ -134,7 +134,7 @@ Runs the Google Antigravity CLI (`agy`) with **Remote Control** enabled, allowin
 ### First-Time Google Sign-In (Web UI)
 1. Start the **Antigravity Remote** add-on.
 2. Click **Open Web UI** (Home Assistant Ingress) to open the built-in web terminal.
-3. Run `agy login` and open the printed Google OAuth URL in your browser to sign in.
+3. Run `agy` (without arguments) and open the printed Google OAuth URL in your browser to sign in. Exit the CLI afterwards with `/exit` or `Ctrl+D Ctrl+D`.
 4. Once signed in, the add-on automatically starts `agy remote-control` within 15 seconds.
 
 ### Configuration Options
