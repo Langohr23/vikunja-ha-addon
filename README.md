@@ -126,6 +126,9 @@ If you encounter issues, please check the Add-on logs and report bugs in the [Is
 
 ## Antigravity Remote Installation
 
+> [!NOTE]
+> **Unofficial Home Assistant Add-on.** This project is not affiliated with, endorsed by, or sponsored by Google. The Antigravity CLI (`agy`) is downloaded directly from `https://antigravity.google` during the local Docker build on your Home Assistant instance.
+
 Runs the Google Antigravity CLI (`agy`) with **Remote Control** enabled, allowing you to use local-network MCP servers (Streamable HTTP/SSE or `stdio`) from Gemini Remote (`https://antigravity.google`).
 
 ### First-Time Google Sign-In (Web UI)
